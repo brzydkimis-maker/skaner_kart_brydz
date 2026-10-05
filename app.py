@@ -5,12 +5,10 @@ import re
 from flask import Flask, request, jsonify
 import anthropic
 
-# === TUTAJ WKLEJ SWÓJ KLUCZ API OD ANTHROPIC (CLAUDE) ===
+# Bezpieczne pobieranie klucza z pamięci chmury Render (bez ujawniania go światu!)
 CLAUDE_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-# =======================================================
 
 app = Flask(__name__)
-
 client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
 
 @app.route('/api/vision/analyze-cards', methods=['POST'])
@@ -30,7 +28,7 @@ def analyze_hand():
     prompt = """
     Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
     
-    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czстый, surowy format JSON (obiekt zawierający klucz "cards"):
+    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czysty, surowy format JSON (obiekt zawierający klucz "cards"):
     {"cards": ["KARTA1", "KARTA2", ...]}
     
     ZASADY BEZPIECZEŃSTWA:
@@ -59,22 +57,25 @@ def analyze_hand():
             ],
         )
 
-        # OFICJALNY POPRAWNY SPOSÓB: Wyciąganie tekstu z pierwszego bloku odpowiedzi content
-        response_text = ""
-        if response.content and len(response.content) > 0:
-            response_text = response.content[0].text.strip()
+        # BEZBŁĘDNE WYCIĄGANIE TEKSTU Z MODELU SONNET 5 (Z OMINIĘCIEM BLOKÓW THINKING):
+        text_segments = []
+        for block in response.content:
+            # Filtrujemy bloki i wyciągamy tekst wyłącznie z elementów o typie 'text'
+            if block.type == "text" and hasattr(block, "text"):
+                text_segments.append(block.text)
         
+        response_text = "".join(text_segments).strip()
         print(f"[CLAUDE VISION] Surowa odpowiedź od AI: {response_text}")
 
-        # OBRONA PRZED KOMENTARZAMI: Filtrujemy dane, izolując wyłącznie strukturę nawiasów klamrowych { }
+        # OBRONA PRZED KOMENTARZAMI LUDZKIMI: Izolujemy wyłącznie zawartość klamer { }
         json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
         if json_match:
             response_text = json_match.group(0)
             print(f"[CLAUDE VISION] Oczyszczono tekst do formatu JSON: {response_text}")
         else:
-            raise ValueError("Serwer AI nie zwrócił poprawnego formatu JSON wewnątrz tekstu odpowiedzi.")
+            raise ValueError("Serwer AI nie zwrócił poprawnej struktury JSON.")
 
-        # Parsowanie oczyszczonego tekstu i bezpieczny zwrot do telefonu
+        # Parsowanie końcowe i bezpieczna wysyłka wyniku do telefonu
         result_json = json.loads(response_text)
         print(f"[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
         return jsonify(result_json)
