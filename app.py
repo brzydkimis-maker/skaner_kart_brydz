@@ -38,6 +38,13 @@ def analyze_hand():
     
     Oznaczenia kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
     Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
+
+    RYGORYSTYCZNE ZASADY WERYFIKACJI (6 VS 9):
+    1. Zwróć szczególną uwagę na karty "6" i "9". Ze względu na obrót i perspektywę łatwo je pomylić lub uznać jedną fizyczną kartę za dwie osobne (szóstkę i dziewiątkę równocześnie).
+    2. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. W brydżu na ręce gracza może być dokładnie 13 kart.
+    3. Jeżeli w Twojej wstępnej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i błędnie zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). 
+    4. W takiej sytuacji bezwzględnie usuń nadmiarową kartę (6 lub 9), upewniając się, że ostateczny wynik zawiera dokładnie te 13 kart, które realnie leżą na stole.
+
     """
 
     try:
