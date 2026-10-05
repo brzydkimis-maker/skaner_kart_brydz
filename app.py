@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 import anthropic
 
 # === TUTAJ WKLEJ SWÓJ KLUCZ API OD ANTHROPIC (CLAUDE) ===
-CLAUDE_API_KEY = "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" 
+CLAUDE_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 # =======================================================
 
 app = Flask(__name__)
