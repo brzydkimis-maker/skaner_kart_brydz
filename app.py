@@ -1,4 +1,4 @@
-ort os
+import os
 import json
 import base64
 import re
@@ -25,7 +25,7 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-    # POWRÓT: Oryginalny, rygorystyczny i sprawdzony polski prompt brydżowy
+    # PRZYWRÓCONY: Pełny, dokładny prompt brydżowy z weryfikacją matematyczną 6 vs 9
     prompt = """
     Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
     
@@ -39,13 +39,14 @@ def analyze_hand():
     4. Jeżeli w Twojej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). W takiej sytuacji bezwzględnie usuń nadmiarową kartę, dopasowując wynik do 13 kart realnie leżących na stole.
     5. Nie dopisuj żadnych komentarzy, wyjaśnień ani formatowania markdown (```json). Zwróć czysty tekst obiektu JSON.
     
-    Oznaczania kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
+    Oznaczenia kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
     Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
     """
 
     try:
         print("[CLAUDE VISION] Wysyłam zapytanie do precyzyjnego modelu Claude Sonnet 5...")
         
+        # PRZYWRÓCONO: Najlepszy i najbardziej inteligentny model inżynieryjny Sonnet 5
         response = client.messages.create(
             model="claude-sonnet-5",
             max_tokens=1500,
@@ -78,7 +79,7 @@ def analyze_hand():
             raise ValueError("Serwer AI nie zwrócił poprawnej struktury JSON.")
 
         result_json = json.loads(response_text)
-        print(f"\n[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
+        print(f"[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
         return jsonify(result_json)
 
     except Exception as e:
