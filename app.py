@@ -1,11 +1,11 @@
-import os
+mport os
 import json
 import base64
 import re
 from flask import Flask, request, jsonify
 import anthropic
 
-# Bezpieczne pobieranie klucza z pamięci chmury Render (bez ujawniania go światu!)
+# Bezpieczne pobieranie klucza z pamięci chmury Render
 CLAUDE_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 app = Flask(__name__)
@@ -25,17 +25,19 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
+    # Odchudzona, błyskawiczna instrukcja dla modelu Haiku 4.5
     prompt = """
     Identify all bridge cards in the photo. 
     Return ONLY clean JSON object: {"cards": ["RANK+SUIT", ...]}. No markdown, no prose.
     Suits: P, C, K, T. Ranks: A, K, Q, J, 10-2. Max 13 cards. Fix 6/9 flips orientationally.
     """
+
     try:
-        print("[CLAUDE VISION] Wysyłam zapytanie do modelu Claude Sonnet 5...")
+        print("[CLAUDE VISION] Wysyłam zapytanie do superszybkiego modelu Claude Haiku...")
         
         response = client.messages.create(
             model="claude-haiku-4.5",
-            max_tokens=1500,
+            max_tokens=1000,
             messages=[
                 {
                     "role": "user",
@@ -47,17 +49,16 @@ def analyze_hand():
             ],
         )
 
-        # BEZBŁĘDNE WYCIĄGANIE TEKSTU Z MODELU SONNET 5 (Z OMINIĘCIEM BLOKÓW THINKING):
+        # Filtrowanie bloków i bezpieczne wyciąganie tekstu (ochrona przed ThinkingBlock)
         text_segments = []
         for block in response.content:
-            # Filtrujemy bloki i wyciągamy tekst wyłącznie z elementów o typie 'text'
             if block.type == "text" and hasattr(block, "text"):
                 text_segments.append(block.text)
         
         response_text = "".join(text_segments).strip()
         print(f"[CLAUDE VISION] Surowa odpowiedź od AI: {response_text}")
 
-        # OBRONA PRZED KOMENTARZAMI LUDZKIMI: Izolujemy wyłącznie zawartość klamer { }
+        # Izolacja samego formatu JSON
         json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
         if json_match:
             response_text = json_match.group(0)
@@ -65,7 +66,6 @@ def analyze_hand():
         else:
             raise ValueError("Serwer AI nie zwrócił poprawnej struktury JSON.")
 
-        # Parsowanie końcowe i bezpieczna wysyłka wyniku do telefonu
         result_json = json.loads(response_text)
         print(f"[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
         return jsonify(result_json)
