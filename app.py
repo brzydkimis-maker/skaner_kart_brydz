@@ -1,4 +1,4 @@
-import os
+ort os
 import json
 import base64
 import re
@@ -25,30 +25,22 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-    # KOMPLETNY, ZOPTYMALIZOWANY PROMPT PO ANGIELSKU
+    # POWRÓT: Oryginalny, rygorystyczny i sprawdzony polski prompt brydżowy
     prompt = """
-    You are a professional Bridge AI vision system. Your task is to detect and list all bridge cards visible in the photo.
+    Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
     
-    CRITICAL OUTPUT RULE:
-    Return the result STRICTLY and EXCLUSIVELY as a raw JSON object (containing only the "cards" key):
-    {"cards": ["CARD1", "CARD2", ...]}
+    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czysty, surowy format JSON (obiekt zawierający klucz "cards"):
+    {"cards": ["KARTA1", "KARTA2", ...]}
     
-    Strictly NO markdown blocks (```json), NO explanations, NO comments, NO prose. Output only pure JSON.
+    ZASADY BEZPIECZEŃSTWA:
+    1. W tradycyjnej talii brydżowej KAŻDA KARTA JEST UNIKALNA. Niedozwolone jest, aby w wyniku pojawiła się ta sama karta dwa razy.
+    2. Zwróć szczególną uwagę na karty 6 i 9. Często wyglądają podobnie, gdy są odwrócone. Sprawdź orientację indeksu na podstawie ułożenia pozostałych kart, aby upewnić się, czy to 6, czy 9.
+    3. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. Na ręce brydżysty powinno być dokładnie 13 kart.
+    4. Jeżeli w Twojej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). W takiej sytuacji bezwzględnie usuń nadmiarową kartę, dopasowując wynik do 13 kart realnie leżących na stole.
+    5. Nie dopisuj żadnych komentarzy, wyjaśnień ani formatowania markdown (```json). Zwróć czysty tekst obiektu JSON.
     
-    SAFETY & LOGIC RULES:
-    1. Every card in a bridge hand is UNIQUE. No duplicate card codes are allowed in the output.
-    2. Pay extreme attention to "6" and "9" ranks. They often look identical when inverted. Verify their orientation based on the layout of neighboring cards.
-    3. Perform a strict internal count before outputting: A valid bridge hand has EXACTLY 13 cards.
-    4. If your initial count detects 14 or more cards, it means you misidentified an inverted 6 as a 9 (or vice versa). In this case, you MUST re-evaluate, fix the 6/9 flip, and remove the ghost card to match exactly 13 real cards.
-    
-    SUIT & RANK CODES (STRICT):
-    Suits MUST be international letters:
-    S - Spades (Pik)
-    H - Hearts (Kier)
-    D - Diamonds (Karo) -> Use ONLY 'D' for Diamonds to avoid conflict with the King (K)!
-    C - Clubs (Trefl)
-    
-    Format: [Rank][Suit] (Examples: Ace of Spades is "AS", King of Diamonds is "KD", 6 of Hearts is "6H", Jack of Clubs is "JC" or "WC"). Both English and Polish rank letters (J/W, Q/D, K) are acceptable.
+    Oznaczania kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
+    Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
     """
 
     try:
