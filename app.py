@@ -33,16 +33,11 @@ def analyze_hand():
     {"cards": ["KARTA1", "KARTA2", ...]}
     
     ZASADY BEZPIECZEŃSTWA:
-    1. Każda karta w pliku JSON musi zawierać zarówno FIGURĘ/NUMER, jak i LITERE KOLORU. Przykład: "KP" (Król Pik), "10C" (Dziesiątka Kier), "6K" (Szóstka Karo), "2T" (Dwójka Trefl). Niedozwolone jest wpisywanie samych liter kolorów bez wartości numerycznych!
+    1. Każda karta w pliku JSON musi zawierać wartość oraz litere koloru wyłącznie w formacie międzynarodowym: S (Pik), H (Kier), D (Karo), C (Trefl). Przykład: "AS" (As Pik), "KD" (Król Karo), "6H" (Szóstka Kier), "2C" (Dwójka Trefl). Bezwzględnie nie używaj litery K dla koloru Karo!
     2. W tradycyjnej talii brydżowej KAŻDA KARTA JEST UNIKALNA. Niedozwolone jest, aby w wyniku pojawiła się ta sama karta dwa razy.
-    3. Zwróć szczególną uwagę na karty 6 i 9. Często wyglądają podobnie, gdy są odwrócone. Sprawdź orientację indeksu na podstawie ułożenia pozostałych kart, aby upewnić się, czy to 6, czy 9.
-    4. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. Na ręce brydżysty powinno być dokładnie 13 kart. Jeśli wykryłeś 14+ kart, napraw pomyłkę 6/9 i usuń nadmiarowy element.
+    3. Zwróć szczególną uwagę na karty 6 i 9. Sprawdź orientację indeksu na podstawie ułożenia pozostałych kart, aby upewnić się, czy to 6, czy 9.
+    4. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. Na ręce brydżysty powinno być dokładnie 13 kart. Jeśli wykryłeś więcej kart, usuń nadmiarowe omamy optyczne, aby dopasować wynik do 13 kart realnie leżących na stole.
     5. Nie dopisuj żadnych komentarzy, wyjaśnień ani formatowania markdown (```json). Zwróć czysty tekst obiektu JSON.
-    
-    OZNACZENIA KOLORÓW (RYGORYSTYCZNE): 
-    P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
-    
-    Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
     """
 
     try:
