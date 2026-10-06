@@ -26,21 +26,17 @@ def analyze_hand():
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
     # PRZYWRÓCONY: Pełny, dokładny prompt brydżowy z weryfikacją matematyczną 6 vs 9
-    prompt = """
-    Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
-    
-    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czysty, surowy format JSON (obiekt zawierający klucz "cards"):
-    {"cards": ["KARTA1", "KARTA2", ...]}
-    
-    ZASADY BEZPIECZEŃSTWA:
-    1. W tradycyjnej talii brydżowej KAŻDA KARTA JEST UNIKALNA. Niedozwolone jest, aby w wyniku pojawiła się ta sama karta dwa razy.
-    2. Zwróć szczególną uwagę na karty 6 i 9. Często wyglądają podobnie, gdy są odwrócone. Sprawdź orientację indeksu na podstawie ułożenia pozostałych kart, aby upewnić się, czy to 6, czy 9.
-    3. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. Na ręce brydżysty powinno być dokładnie 13 kart.
-    4. Jeżeli w Twojej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). W takiej sytuacji bezwzględnie usuń nadmiarową kartę, dopasowując wynik do 13 kart realnie leżących na stole.
-    5. Nie dopisuj żadnych komentarzy, wyjaśnień ani formatowania markdown (```json). Zwróć czysty tekst obiektu JSON.
-    
-    Oznaczenia kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
-    Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
+  prompt = """
+    Return ONLY a raw JSON object containing detected bridge cards from the photo:
+    {"cards": ["RANK+SUIT", "RANK+SUIT", ...]}
+
+    CRITICAL RULES:
+    1. Suits MUST be international: S (Spades), H (Hearts), D (Diamonds), C (Clubs). Do not use P, C, K, T.
+    2. Ranks MUST be: A, K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3, 2. (Example: "AD", "10S", "6H").
+    3. Every card must be unique. No duplicates allowed in the JSON array.
+    4. Count the cards before outputting. A bridge hand has EXACTLY 13 cards.
+    5. Pay extreme attention to 6 and 9 ranks. If you detect 14+ cards, look for a 6/9 misinterpretation, fix it, and remove the ghost card to match exactly 13 cards.
+    6. Absolutely NO markdown block (```json), NO comments, NO prose. Output only the pure JSON brackets.
     """
 
     try:
