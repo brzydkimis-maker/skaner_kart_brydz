@@ -25,17 +25,15 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-   prompt = """
+    prompt = """
     Identify all bridge cards in the photo. 
     Return ONLY clean JSON object: {"cards": ["RANK+SUIT", ...]}. No markdown, no prose.
     Suits: P, C, K, T. Ranks: A, K, Q, J, 10-2. Max 13 cards. Fix 6/9 flips orientationally.
     """
-
     try:
         print("[CLAUDE VISION] Wysyłam zapytanie do modelu Claude Sonnet 5...")
         
         response = client.messages.create(
-            #model="claude-sonnet-5",
             model="claude-haiku-4.5",
             max_tokens=1500,
             messages=[
