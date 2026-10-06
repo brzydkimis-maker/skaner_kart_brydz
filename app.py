@@ -25,8 +25,8 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-    # PRZYWRÓCONY: Pełny, dokładny prompt brydżowy z weryfikacją matematyczną 6 vs 9
-prompt = """
+    # KOMPLETNY, ZOPTYMALIZOWANY PROMPT PO ANGIELSKU
+    prompt = """
     You are a professional Bridge AI vision system. Your task is to detect and list all bridge cards visible in the photo.
     
     CRITICAL OUTPUT RULE:
@@ -54,7 +54,6 @@ prompt = """
     try:
         print("[CLAUDE VISION] Wysyłam zapytanie do precyzyjnego modelu Claude Sonnet 5...")
         
-        # PRZYWRÓCONO: Najlepszy i najbardziej inteligentny model inżynieryjny Sonnet 5
         response = client.messages.create(
             model="claude-sonnet-5",
             max_tokens=1500,
@@ -87,7 +86,7 @@ prompt = """
             raise ValueError("Serwer AI nie zwrócił poprawnej struktury JSON.")
 
         result_json = json.loads(response_text)
-        print(f"[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
+        print(f"\n[CLAUDE VISION] SUKCES! Przesyłam do telefonu: {result_json.get('cards', [])}")
         return jsonify(result_json)
 
     except Exception as e:
