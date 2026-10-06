@@ -26,17 +26,29 @@ def analyze_hand():
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
     # PRZYWRÓCONY: Pełny, dokładny prompt brydżowy z weryfikacją matematyczną 6 vs 9
-  prompt = """
-    Return ONLY a raw JSON object containing detected bridge cards from the photo:
-    {"cards": ["RANK+SUIT", "RANK+SUIT", ...]}
-
-    CRITICAL RULES:
-    1. Suits MUST be international: S (Spades), H (Hearts), D (Diamonds), C (Clubs). Do not use P, C, K, T.
-    2. Ranks MUST be: A, K, Q, J, 10, 9, 8, 7, 6, 5, 4, 3, 2. (Example: "AD", "10S", "6H").
-    3. Every card must be unique. No duplicates allowed in the JSON array.
-    4. Count the cards before outputting. A bridge hand has EXACTLY 13 cards.
-    5. Pay extreme attention to 6 and 9 ranks. If you detect 14+ cards, look for a 6/9 misinterpretation, fix it, and remove the ghost card to match exactly 13 cards.
-    6. Absolutely NO markdown block (```json), NO comments, NO prose. Output only the pure JSON brackets.
+prompt = """
+    You are a professional Bridge AI vision system. Your task is to detect and list all bridge cards visible in the photo.
+    
+    CRITICAL OUTPUT RULE:
+    Return the result STRICTLY and EXCLUSIVELY as a raw JSON object (containing only the "cards" key):
+    {"cards": ["CARD1", "CARD2", ...]}
+    
+    Strictly NO markdown blocks (```json), NO explanations, NO comments, NO prose. Output only pure JSON.
+    
+    SAFETY & LOGIC RULES:
+    1. Every card in a bridge hand is UNIQUE. No duplicate card codes are allowed in the output.
+    2. Pay extreme attention to "6" and "9" ranks. They often look identical when inverted. Verify their orientation based on the layout of neighboring cards.
+    3. Perform a strict internal count before outputting: A valid bridge hand has EXACTLY 13 cards.
+    4. If your initial count detects 14 or more cards, it means you misidentified an inverted 6 as a 9 (or vice versa). In this case, you MUST re-evaluate, fix the 6/9 flip, and remove the ghost card to match exactly 13 real cards.
+    
+    SUIT & RANK CODES (STRICT):
+    Suits MUST be international letters:
+    S - Spades (Pik)
+    H - Hearts (Kier)
+    D - Diamonds (Karo) -> Use ONLY 'D' for Diamonds to avoid conflict with the King (K)!
+    C - Clubs (Trefl)
+    
+    Format: [Rank][Suit] (Examples: Ace of Spades is "AS", King of Diamonds is "KD", 6 of Hearts is "6H", Jack of Clubs is "JC" or "WC"). Both English and Polish rank letters (J/W, Q/D, K) are acceptable.
     """
 
     try:
