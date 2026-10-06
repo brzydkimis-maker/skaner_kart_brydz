@@ -1,3 +1,4 @@
+python
 import os
 import json
 import base64
@@ -5,7 +6,7 @@ import re
 from flask import Flask, request, jsonify
 import anthropic
 
-# Bezpieczne pobieranie klucza z pamięci chmury Render
+# Bezpieczne pobieranie klucza z pamięci chmury Render (zmienna środowiskowa)
 CLAUDE_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 
 app = Flask(__name__)
@@ -25,19 +26,31 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-    # Odchudzona, błyskawiczna instrukcja dla modelu Haiku 4.5
+    # PRZYWRÓCONY: Pełny, dokładny prompt brydżowy z weryfikacją matematyczną 6 vs 9
     prompt = """
-    Identify all bridge cards in the photo. 
-    Return ONLY clean JSON object: {"cards": ["RANK+SUIT", ...]}. No markdown, no prose.
-    Suits: P, C, K, T. Ranks: A, K, Q, J, 10-2. Max 13 cards. Fix 6/9 flips orientationally.
+    Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
+    
+    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czysty, surowy format JSON (obiekt zawierający klucz "cards"):
+    {"cards": ["KARTA1", "KARTA2", ...]}
+    
+    ZASADY BEZPIECZEŃSTWA:
+    1. W tradycyjnej talii brydżowej KAŻDA KARTA JEST UNIKALNA. Niedozwolone jest, aby w wyniku pojawiła się ta sama karta dwa razy.
+    2. Zwróć szczególną uwagę na karty 6 i 9. Często wyglądają podobnie, gdy są odwrócone. Sprawdź orientację indeksu na podstawie ułożenia pozostałych kart, aby upewnić się, czy to 6, czy 9.
+    3. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. Na ręce brydżysty powinno być dokładnie 13 kart.
+    4. Jeżeli w Twojej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). W takiej sytuacji bezwzględnie usuń nadmiarową kartę, dopasowując wynik do 13 kart realnie leżących na stole.
+    5. Nie dopisuj żadnych komentarzy, wyjaśnień ani formatowania markdown (```json). Zwróć czysty tekst obiektu JSON.
+    
+    Oznaczenia kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
+    Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
     """
 
     try:
-        print("[CLAUDE VISION] Wysyłam zapytanie do superszybkiego modelu Claude Haiku...")
+        print("[CLAUDE VISION] Wysyłam zapytanie do precyzyjnego modelu Claude Sonnet 5...")
         
+        # PRZYWRÓCONO: Najlepszy i najbardziej inteligentny model inżynieryjny Sonnet 5
         response = client.messages.create(
-           model="claude-haiku-4-5-20251001",
-            max_tokens=1000,
+            model="claude-sonnet-5",
+            max_tokens=1500,
             messages=[
                 {
                     "role": "user",
@@ -49,7 +62,7 @@ def analyze_hand():
             ],
         )
 
-        # Filtrowanie bloków i bezpieczne wyciąganie tekstu (ochrona przed ThinkingBlock)
+        # Bezpieczne filtrowanie bloków myślowych Sonnet 5 (ochrona przed błędem ThinkingBlock)
         text_segments = []
         for block in response.content:
             if block.type == "text" and hasattr(block, "text"):
@@ -58,7 +71,7 @@ def analyze_hand():
         response_text = "".join(text_segments).strip()
         print(f"[CLAUDE VISION] Surowa odpowiedź od AI: {response_text}")
 
-        # Izolacja samego formatu JSON
+        # Izolacja czystego formatu JSON z klamer { }
         json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
         if json_match:
             response_text = json_match.group(0)
