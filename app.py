@@ -25,33 +25,18 @@ def analyze_hand():
 
     image_base64 = base64.b64encode(file_bytes).decode('utf-8')
 
-    prompt = """
-    Jesteś profesjonalnym systemem brydżowym AI. Twoim zadaniem jest wykryć i wypisać wszystkie karty brydżowe widoczne na zdjęciu.
-    
-    Zwróć wynik BEZWZGLĘDNIE i WYŁĄCZNIE jako czysty, surowy format JSON (obiekt zawierający klucz "cards"):
-    {"cards": ["KARTA1", "KARTA2", ...]}
-    
-    ZASADY BEZPIECZEŃSTWA:
-    1. Jeśli na zdjęciu jest mniej lub więcej niż 13 kart (np. tylko 1 karta), po prostu wypisz ją w liście, np. {"cards": ["AP"]}.
-    2. NIE DOPISUJ żadnych komentarzy, wyjaśnień, ostrzeżeń ani zdań w stylu "Na zdjęciu widoczna jest...".
-    3. Nie używaj formatowania markdown (```json). Zwróć wyłącznie nawiasy klamrowe i dane.
-    
-    Oznaczenia kolorów: P (Pik), C (Czerwień/Kier), K (Karo), T (Trefl)
-    Oznaczenia figur: A (As), K (Król), Q (Dama), J (Walet), 10, 9, 8, 7, 6, 5, 4, 3, 2
-
-    RYGORYSTYCZNE ZASADY WERYFIKACJI (6 VS 9):
-    1. Zwróć szczególną uwagę na karty "6" i "9". Ze względu na obrót i perspektywę łatwo je pomylić lub uznać jedną fizyczną kartę za dwie osobne (szóstkę i dziewiątkę równocześnie).
-    2. Przed zwróceniem wyniku zrób wewnętrzny test: policz wszystkie wykryte karty. W brydżu na ręce gracza może być dokładnie 13 kart.
-    3. Jeżeli w Twojej wstępnej analizie liczba kart wynosi 14 lub więcej, oznacza to, że popełniłeś błąd i błędnie zinterpretowałeś obróconą szóstkę jako dziewiątkę (lub odwrotnie). 
-    4. W takiej sytuacji bezwzględnie usuń nadmiarową kartę (6 lub 9), upewniając się, że ostateczny wynik zawiera dokładnie te 13 kart, które realnie leżą na stole.
-
+   prompt = """
+    Identify all bridge cards in the photo. 
+    Return ONLY clean JSON object: {"cards": ["RANK+SUIT", ...]}. No markdown, no prose.
+    Suits: P, C, K, T. Ranks: A, K, Q, J, 10-2. Max 13 cards. Fix 6/9 flips orientationally.
     """
 
     try:
         print("[CLAUDE VISION] Wysyłam zapytanie do modelu Claude Sonnet 5...")
         
         response = client.messages.create(
-            model="claude-sonnet-5",
+            #model="claude-sonnet-5",
+            model="claude-haiku-4.5",
             max_tokens=1500,
             messages=[
                 {
